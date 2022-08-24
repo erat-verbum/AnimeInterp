@@ -42,7 +42,7 @@ def backwarp(img, flow):
     # stacking X and Y
     grid = torch.stack((x,y), dim=3)
     # Sample pixels using bilinear interpolation.
-    imgOut = torch.nn.functional.grid_sample(img, grid)
+    imgOut = torch.nn.functional.grid_sample(img, grid, align_corners=True, mode="bilinear")
 
     return imgOut
 class ErrorAttention(nn.Module):
@@ -188,9 +188,8 @@ class RFR(nn.Module):
         flow_predictions = []
         for itr in range(iters):
             coords1 = coords1.detach()
-            if itr == 0:
-                if flow_init is not None:
-                    coords1 = coords1 + flow_init
+            if itr == 0 and flow_init is not None:
+                coords1 = coords1 + flow_init
             corr = corr_fn(coords1) # index correlation volume
 
             flow = coords1 - coords0
@@ -205,7 +204,7 @@ class RFR(nn.Module):
                 flow_up = upflow8(coords1 - coords0)
             else:
                 flow_up = self.upsample_flow(coords1 - coords0, up_mask)
-            
+
             flow_predictions.append(flow_up)
 
 

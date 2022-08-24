@@ -69,7 +69,7 @@ class AnimeInterp(nn.Module):
         tmp[:, 1:] = tmp[:, 1:].clone() * tmp.size()[2] / flo.size()[2]
 
         return tmp
-    def forward(self, I1, I2, F12i, F21i, t):
+    def forward(self, I1, I2, t):
         r = 0.6
 
         # I1 = I1[:, [2, 1, 0]]
@@ -87,8 +87,8 @@ class AnimeInterp(nn.Module):
 
         # with torch.no_grad():
         # self.flownet.eval()
-        F12, F12in, err12, = self.flownet(I1o, I2o, iters=12, test_mode=False, flow_init=F12i)
-        F21, F21in, err12, = self.flownet(I2o, I1o, iters=12, test_mode=False, flow_init=F21i)
+        F12, F12in, err12, = self.flownet(I1o, I2o, iters=12, test_mode=False, flow_init=None)
+        F21, F21in, err12, = self.flownet(I2o, I1o, iters=12, test_mode=False, flow_init=None)
 
         F1t = t * F12
         F2t = (1-t) * F21
@@ -145,11 +145,4 @@ class AnimeInterp(nn.Module):
 
         # synthesis
         It_warp = self.synnet(torch.cat([I1t, I2t], dim=1), torch.cat([feat1t1, feat2t1], dim=1), torch.cat([feat1t2, feat2t2], dim=1), torch.cat([feat1t3, feat2t3], dim=1))
-
-
-
         return It_warp, F12, F21, F12in, F21in
-
-
-
-
