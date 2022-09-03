@@ -68,10 +68,10 @@ def main():
   for f in tqdm(files):
     with torch.no_grad():
       filename_frame_1 = f
-      filename_frame_2 = os.path.join(input_frames_dir, f'{input_frame+1:0>5d}.png')
+      filename_frame_2 = os.path.join(input_frames_dir, f'{input_frame+1:0>10d}.png')
 
-      first_output_filename = os.path.join(output_frames_dir, f'{(input_frame-1)*(frame_factor+1)+1:0>5d}.png')
-      last_output_filename = os.path.join(output_frames_dir, f'{input_frame*(frame_factor+1):0>5d}.png')
+      first_output_filename = os.path.join(output_frames_dir, f'{(input_frame-1)*(frame_factor+1)+1:0>10d}.png')
+      last_output_filename = os.path.join(output_frames_dir, f'{input_frame*(frame_factor+1):0>10d}.png')
 
       shutil.copy(filename_frame_1, first_output_filename)
       shutil.copy(filename_frame_2, last_output_filename)
@@ -83,7 +83,7 @@ def main():
       frame2 = transform1(frame2).unsqueeze(0)
 
       for i in range(1, frame_factor + 1):
-        output_frame_file_path = os.path.join(output_frames_dir, f"{(input_frame-1)*(frame_factor+1)+1+i:0>5d}.png")
+        output_frame_file_path = os.path.join(output_frames_dir, f"{(input_frame-1)*(frame_factor+1)+1+i:0>10d}.png")
 
         outputs = model(frame1.cuda(), frame2.cuda(), i/(frame_factor + 1))
         It_warp = outputs[0]
