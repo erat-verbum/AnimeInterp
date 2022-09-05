@@ -22,13 +22,14 @@ def main():
 
   parser.add_argument("-o", "--output", type=str, default="./datasets/test_output_frames", help="Directory of output frames")
 
-  parser.add_argument("-f", "--factor", type=int, default=1, help="Number of frames to add between two of the original frames")
+  parser.add_argument("-n", "--num_extra_frames", type=int, default=1, help="Number of frames to add between two of the original frames")
 
   args = parser.parse_args()
 
   input_frames_dir = args.input
   output_frames_dir = args.output
-  frame_factor = args.factor
+  num_extra_frames = args.num_extra_frames
+  scale_factor = num_extra_frames + 1
 
   files = sorted(glob.glob(input_frames_dir + '/**/*.png', recursive=True))
   del files[-1]
@@ -70,8 +71,11 @@ def main():
       filename_frame_1 = f
       filename_frame_2 = os.path.join(input_frames_dir, f'{input_frame+1:0>10d}.png')
 
-      first_output_filename = os.path.join(output_frames_dir, f'{(input_frame-1)*(frame_factor+1)+1:0>10d}.png')
-      last_output_filename = os.path.join(output_frames_dir, f'{input_frame*(frame_factor+1):0>10d}.png')
+      first_filename_num = (input_frame-1)*scale_factor+1
+      last_filename_num = first_filename_num+scale_factor
+
+      first_output_filename = os.path.join(output_frames_dir, f'{first_filename_num:0>10d}.png')
+      last_output_filename = os.path.join(output_frames_dir, f'{last_filename_num:0>10d}.png')
 
       shutil.copy(filename_frame_1, first_output_filename)
       shutil.copy(filename_frame_2, last_output_filename)
@@ -82,10 +86,11 @@ def main():
       frame1 = transform1(frame1).unsqueeze(0)
       frame2 = transform1(frame2).unsqueeze(0)
 
-      for i in range(1, frame_factor + 1):
-        output_frame_file_path = os.path.join(output_frames_dir, f"{(input_frame-1)*(frame_factor+1)+1+i:0>10d}.png")
+      for i in range(1, num_extra_frames + 1):
+        output_frame_num = first_filename_num + i
+        output_frame_file_path = os.path.join(output_frames_dir, f"{output_frame_num:0>10d}.png")
 
-        outputs = model(frame1.cuda(), frame2.cuda(), i/(frame_factor + 1))
+        outputs = model(frame1.cuda(), frame2.cuda(), i/(num_extra_frames + 1))
         It_warp = outputs[0]
         to_img(revNormalize(It_warp.cpu()[0]).clamp(0.0, 1.0)).save(output_frame_file_path)
 

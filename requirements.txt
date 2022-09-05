@@ -1,7 +1,7 @@
-torch
+# torch
 opencv-python
 scikit-image
-torchvision
+# torchvision
 numpy
 # cupy
 tqdm
