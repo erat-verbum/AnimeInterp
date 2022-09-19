@@ -78,7 +78,7 @@ def main():
           intermediary_frame_num = prev_frame_num + i + 1
           intermediary_frame_file_path = os.path.join(frames_dir, f"{intermediary_frame_num:0>10d}.png")
 
-          outputs = model(frame1.cuda(), frame2.cuda(), i/(num_intermediary_frames + 1))
+          outputs = model(frame1.cuda(), frame2.cuda(), (i + 1)/(num_intermediary_frames + 1))
           It_warp = outputs[0]
           to_img(revNormalize(It_warp.cpu()[0]).clamp(0.0, 1.0)).save(intermediary_frame_file_path)
 
